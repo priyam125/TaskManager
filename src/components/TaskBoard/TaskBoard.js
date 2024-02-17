@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CategoryContainer from "../CategoryContainer/CategoryContainer";
 
 const TaskBoard = () => {
@@ -8,6 +8,10 @@ const TaskBoard = () => {
     { id: 3, title: "Completed" },
   ]);
 
+  const [task, setTask] = useState("");
+
+  const [tasks, setTasks] = useState([]);
+
   const [activeCategoryId, setActiveCategoryId] = useState(null); // State to track active category with open input box
 
   const setActiveCategory = (categoryId) => {
@@ -15,8 +19,12 @@ const TaskBoard = () => {
   };
 
   const closeInput = () => {
-    setActiveCategoryId(null); // Close the input box by setting active category to null
+    setActiveCategoryId(null);
   };
+
+  useEffect(() => {
+    setTask("");
+  }, [activeCategoryId]);
 
   const generateId = () => {
     return Math.floor(Math.random() * 10001);
@@ -26,8 +34,18 @@ const TaskBoard = () => {
     const newTask = {
       id: generateId(),
       categoryId,
+      task,
     };
     console.log(newTask);
+    setTask("");
+    closeInput();
+
+    setTasks([...tasks, newTask]);
+  };
+
+  const deleteTask = (id) => {
+    const newTasks = tasks.filter((task) => task.id !== id);
+    setTasks(newTasks);
   };
 
   return (
@@ -42,6 +60,10 @@ const TaskBoard = () => {
               setActiveCategory={setActiveCategory}
               isActive={activeCategoryId === item.id}
               closeInput={closeInput}
+              task={task}
+              setTask={setTask}
+              tasks={tasks.filter((task) => task.categoryId === item.id)}
+              deleteTask={deleteTask}
             />
           ))}
         </div>
