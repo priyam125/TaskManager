@@ -36,3 +36,19 @@
     transform: rotate(360deg);
   }
 }
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-rose-900 rounded-xl;
+}
+
+.textarea-scrollbar > ::-webkit-scrollbar-thumb {
+  @apply bg-sky-500 rounded-xl;
+}

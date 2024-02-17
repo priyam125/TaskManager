@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { AiOutlineCloseCircle, AiOutlineCheckCircle } from "react-icons/ai";
 import TaskItem from "../TaskItem/TaskItem";
+import "../../App.css";
 
 const CategoryContainer = ({
   category,
@@ -36,16 +37,16 @@ const CategoryContainer = ({
       </div>
       {isActive ? (
         <div className="flex items-center gap-2 border-coloumnBackgroundColor border-2 rounded-md p-2 border-x-coloumnBackgroundColor hover:bg-mainBackgroundColor hover:text-rose-500">
-          <input
+          <textarea
             type="text"
             placeholder="Enter task"
-            className="border border-gray-300 rounded-md p-2 w-full text-black"
+            className="border border-gray-300 rounded-md p-2 w-full text-black textarea-scrollbar"
             name="task"
             value={task}
             onChange={(e) => setTask(e.target.value)}
             autoFocus
           />
-          <div className="flex gap-2">
+          <div className="flex gap-2 h-full">
             <AiOutlineCloseCircle
               onClick={closeInput}
               className="cursor-pointer"
