@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { AiOutlineCloseCircle, AiOutlineCheckCircle } from "react-icons/ai";
 import TaskItem from "../TaskItem/TaskItem";
+import { Droppable } from "react-beautiful-dnd";
 import "../../App.css";
 
 const CategoryContainer = ({
@@ -30,11 +31,26 @@ const CategoryContainer = ({
       <div className="bg-mainBackgroundColor h-14 rounded-md rounded-b-none p-3 font-bold border-4 border-coloumnBackgroundColor">
         {category.title}
       </div>
-      <div className="flex-grow flex flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
-        {tasks?.map((task) => (
-          <TaskItem key={task.id} task={task} deleteTask={deleteTask} />
-        ))}
-      </div>
+      <Droppable droppableId={category.id}>
+        {(provided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="flex-grow flex flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto"
+          >
+            {tasks?.map((task, index) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                deleteTask={deleteTask}
+                index={index}
+              />
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+
       {isActive ? (
         <div className="flex items-center gap-2 border-coloumnBackgroundColor border-2 rounded-md p-2 border-x-coloumnBackgroundColor hover:bg-mainBackgroundColor hover:text-rose-500">
           <textarea
