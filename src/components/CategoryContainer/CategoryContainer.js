@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { AiOutlineCloseCircle, AiOutlineCheckCircle } from "react-icons/ai";
 import TaskItem from "../TaskItem/TaskItem";
@@ -7,15 +7,19 @@ import "../../App.css";
 
 const CategoryContainer = ({
   category,
-  addTask,
+  activeCategoryId,
+  setActiveCategory,
   isActive,
   closeInput,
-  setActiveCategory,
-  task,
-  setTask,
-  tasks,
-  deleteTask,
+  categories,
+  setCategories,
 }) => {
+  const [task, setTask] = useState("");
+
+  useEffect(() => {
+    console.log(category);
+  }, []);
+
   const handleAddTaskClick = () => {
     if (isActive) {
       closeInput(); // Close the input box if the category is already active
@@ -24,7 +28,42 @@ const CategoryContainer = ({
     }
   };
 
-  console.log(tasks);
+  const addTask = (categoryId) => {
+    if (task.trim() === "") return; // Don't add empty tasks
+
+    const newTask = {
+      id: Date.now().toString(), // Generate a unique ID for the task
+      task: task,
+    };
+
+    const updatedCategories = categories.map((cat) => {
+      if (cat.id === categoryId) {
+        return {
+          ...cat,
+          tasks: [...cat.tasks, newTask],
+        };
+      }
+      return cat;
+    });
+
+    setCategories(updatedCategories);
+    setTask(""); // Clear the input field after adding the task
+    closeInput(); // Close the input box
+  };
+
+  const deleteTask = (taskId) => {
+    const updatedCategories = categories.map((cat) => {
+      if (cat.id === category.id) {
+        return {
+          ...cat,
+          tasks: cat.tasks.filter((task) => task.id !== taskId),
+        };
+      }
+      return cat;
+    });
+
+    setCategories(updatedCategories);
+  };
 
   return (
     <div className="bg-coloumnBackgroundColor w-[350px] h-[500px] max-h-[500px] rounded-md flex flex-col">
@@ -38,7 +77,7 @@ const CategoryContainer = ({
             ref={provided.innerRef}
             className="flex-grow flex flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto"
           >
-            {tasks?.map((task, index) => (
+            {category.tasks?.map((task, index) => (
               <TaskItem
                 key={task.id}
                 task={task}

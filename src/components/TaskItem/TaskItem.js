@@ -16,7 +16,7 @@ const TaskItem = ({ task, deleteTask, index }) => {
         >
           <div
             className={`bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl cursor-grab relative textarea-scrollbar ${
-              snapshot.isDragging ? "bg-gray-950" : ""
+              snapshot.isDragging ? "bg-gray-950 text-red-300" : ""
             }`}
             onMouseEnter={() => setIsMouseOver(true)}
             onMouseLeave={() => setIsMouseOver(false)}

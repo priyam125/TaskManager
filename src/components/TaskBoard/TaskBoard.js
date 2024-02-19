@@ -1,58 +1,42 @@
 import React, { useEffect, useState } from "react";
 import CategoryContainer from "../CategoryContainer/CategoryContainer";
 import { DragDropContext } from "react-beautiful-dnd";
+import { initialData } from "../../utils";
 
 const TaskBoard = () => {
-  const [categories, setCategories] = useState([
-    { id: "1", title: "Added" },
-    { id: "2", title: "Started" },
-    { id: "3", title: "Completed" },
-  ]);
+  const [activeCategoryId, setActiveCategoryId] = useState(null);
+  const [categories, setCategories] = useState([]);
 
-  const [task, setTask] = useState("");
+  // Load categories from localStorage on component mount
+  useEffect(() => {
+    const savedCategories = localStorage.getItem("categories");
+    if (savedCategories) {
+      setCategories(JSON.parse(savedCategories));
+    } else {
+      // If no categories found in localStorage, initialize with default categories
+      setCategories(initialData);
+    }
+  }, []);
 
-  const [tasks, setTasks] = useState([]);
-
-  const [activeCategoryId, setActiveCategoryId] = useState(null); // State to track active category with open input box
+  // Save categories to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("categories", JSON.stringify(categories));
+  }, [categories]);
 
   const setActiveCategory = (categoryId) => {
-    setActiveCategoryId(categoryId); // Set the active category with open input box
+    setActiveCategoryId(categoryId);
   };
 
   const closeInput = () => {
     setActiveCategoryId(null);
   };
 
-  useEffect(() => {
-    setTask("");
-  }, [activeCategoryId]);
-
-  const generateId = () => {
-    return Math.floor(Math.random() * 10001);
-  };
-
-  const addTask = (categoryId) => {
-    const newTask = {
-      id: generateId(),
-      categoryId,
-      task,
-    };
-    console.log(newTask);
-    setTask("");
-    closeInput();
-
-    setTasks([...tasks, newTask]);
-  };
-
-  const deleteTask = (id) => {
-    const newTasks = tasks.filter((task) => task.id !== id);
-    setTasks(newTasks);
-  };
-
   const onDragEnd = (result) => {
-    const { source, destination, draggableId } = result;
+    const { source, destination } = result;
 
-    // If there's no destination, or if the draggable item is dropped back into its original position
+    console.log(source);
+    console.log(destination);
+
     if (
       !destination ||
       (source.droppableId === destination.droppableId &&
@@ -61,55 +45,67 @@ const TaskBoard = () => {
       return;
     }
 
-    const updatedTasks = [...tasks];
+    // Get source and destination category
+    const sourceIndex = source.droppableId - 1;
+    const destIndex = destination.droppableId - 1;
 
-    // If the task is moved within the same category
-    if (source.droppableId === destination.droppableId) {
-      const categoryTasks = updatedTasks.filter(
-        (task) => task.categoryId === source.droppableId
-      );
-      const [removed] = categoryTasks.splice(source.index, 1);
-      categoryTasks.splice(destination.index, 0, removed);
+    console.log("sourceIndex", sourceIndex);
+    console.log("destIndex", destIndex);
 
-      // Update the state with the new order of tasks
-      setTasks(
-        updatedTasks.map((task) => {
-          if (task.categoryId === source.droppableId) {
-            return categoryTasks.shift();
-          }
-          return task;
-        })
+    // if same category
+    if (sourceIndex === destIndex) {
+      const tasks = reorder(
+        categories[sourceIndex].tasks,
+        source.index,
+        destination.index
       );
+      const newData = [...categories];
+      newData[sourceIndex].tasks = tasks;
+      setCategories(newData);
     } else {
-      // If the task is moved to a different category
-      const sourceTasks = updatedTasks.filter(
-        (task) => task.categoryId === source.droppableId
+      const result = move(
+        categories[sourceIndex].tasks,
+        categories[destIndex].tasks,
+        source,
+        destination
       );
-      const destinationTasks = updatedTasks.filter(
-        (task) => task.categoryId === destination.droppableId
-      );
-
-      // Find the task that is being dragged
-      const [draggedTask] = sourceTasks.splice(source.index, 1);
-
-      // Update the categoryId of the dragged task to the destination category
-      draggedTask.categoryId = destination.droppableId;
-
-      // Insert the dragged task into the destination category
-      destinationTasks.splice(destination.index, 0, draggedTask);
-
-      // Update the state with the new order of tasks
-      setTasks(
-        updatedTasks.filter((task) => {
-          if (task.categoryId === source.droppableId) {
-            return sourceTasks.shift();
-          } else if (task.categoryId === destination.droppableId) {
-            return destinationTasks.shift();
-          }
-          return task;
-        })
-      );
+      const newData = [...categories];
+      newData[sourceIndex].tasks = result[sourceIndex];
+      newData[destIndex].tasks = result[destIndex];
+      setCategories(newData);
     }
+  };
+
+  // move items within a category
+  const reorder = (data, startIndex, endIndex) => {
+    console.log("data", data);
+    const clonedData = Array.from(data);
+    console.log(clonedData);
+    const [removed] = clonedData.splice(startIndex, 1);
+    clonedData.splice(endIndex, 0, removed);
+
+    return clonedData;
+  };
+  // move item from one category to another
+  const move = (source, destination, droppableSource, droppableDestination) => {
+    const sourceClone = Array.from(source);
+    const destClone = Array.from(destination);
+    console.log("sourceClone", sourceClone);
+    console.log("destClone", destClone);
+    const newSourceClone = [...sourceClone];
+    console.log("droppableSource.index", droppableSource.index);
+    console.log("droppableDestination.index", droppableDestination.index);
+    const [removed] = newSourceClone.splice(droppableSource.index, 1);
+    console.log("sourceClone", sourceClone);
+    console.log("removed", [removed]);
+
+    destClone.splice(droppableDestination.index, 0, removed);
+
+    const result = {};
+    result[droppableSource.droppableId - 1] = newSourceClone;
+    result[droppableDestination.droppableId - 1] = destClone;
+
+    return result;
   };
 
   return (
@@ -121,14 +117,12 @@ const TaskBoard = () => {
               <CategoryContainer
                 key={item.id}
                 category={item}
-                addTask={addTask}
+                setCategories={setCategories}
+                activeCategoryId={activeCategoryId}
+                categories={categories}
                 setActiveCategory={setActiveCategory}
                 isActive={activeCategoryId === item.id}
                 closeInput={closeInput}
-                task={task}
-                setTask={setTask}
-                tasks={tasks.filter((task) => task.categoryId === item.id)}
-                deleteTask={deleteTask}
               />
             ))}
           </div>
