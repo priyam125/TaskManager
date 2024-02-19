@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { CiTrash } from "react-icons/ci";
 import { Draggable } from "react-beautiful-dnd";
 
-const TaskItem = ({ task, deleteTask, index }) => {
+const TaskItem = React.memo(({ task, deleteTask, index }) => {
   const [isMouseOver, setIsMouseOver] = useState(false);
+
+  const handleMouseOver = useCallback(() => {
+    setIsMouseOver(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsMouseOver(false);
+  }, []);
 
   return (
     <Draggable draggableId={task.id.toString()} index={index}>
@@ -18,8 +26,8 @@ const TaskItem = ({ task, deleteTask, index }) => {
             className={`bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl cursor-grab relative textarea-scrollbar ${
               snapshot.isDragging ? "bg-gray-950 text-red-300" : ""
             }`}
-            onMouseEnter={() => setIsMouseOver(true)}
-            onMouseLeave={() => setIsMouseOver(false)}
+            onMouseEnter={handleMouseOver}
+            onMouseLeave={handleMouseLeave}
           >
             <p className="my-auto h-[90%] w-full overflow-y-auto overflow-x-hidden whitespace-pre-wrap">
               {task.task}
@@ -40,6 +48,6 @@ const TaskItem = ({ task, deleteTask, index }) => {
       )}
     </Draggable>
   );
-};
+});
 
 export default TaskItem;

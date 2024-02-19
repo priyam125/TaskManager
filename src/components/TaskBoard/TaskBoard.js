@@ -4,7 +4,6 @@ import { DragDropContext } from "react-beautiful-dnd";
 import { initialData } from "../../utils";
 
 const TaskBoard = () => {
-  const [activeCategoryId, setActiveCategoryId] = useState(null);
   const [categories, setCategories] = useState([]);
 
   // Load categories from localStorage on component mount
@@ -22,14 +21,6 @@ const TaskBoard = () => {
   useEffect(() => {
     localStorage.setItem("categories", JSON.stringify(categories));
   }, [categories]);
-
-  const setActiveCategory = (categoryId) => {
-    setActiveCategoryId(categoryId);
-  };
-
-  const closeInput = () => {
-    setActiveCategoryId(null);
-  };
 
   const onDragEnd = (result) => {
     const { source, destination } = result;
@@ -118,11 +109,7 @@ const TaskBoard = () => {
                 key={item.id}
                 category={item}
                 setCategories={setCategories}
-                activeCategoryId={activeCategoryId}
                 categories={categories}
-                setActiveCategory={setActiveCategory}
-                isActive={activeCategoryId === item.id}
-                closeInput={closeInput}
               />
             ))}
           </div>
