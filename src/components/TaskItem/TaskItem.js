@@ -24,7 +24,7 @@ const TaskItem = React.memo(({ task, deleteTask, index }) => {
         >
           <div
             className={`bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl cursor-grab relative textarea-scrollbar ${
-              snapshot.isDragging ? "bg-gray-950 text-red-300" : ""
+              snapshot.isDragging ? "opacity-80 border-blue-500 border" : ""
             }`}
             onMouseEnter={handleMouseOver}
             onMouseLeave={handleMouseLeave}
