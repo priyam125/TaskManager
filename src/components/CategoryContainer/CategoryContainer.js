@@ -10,10 +10,6 @@ const CategoryContainer = React.memo(
     const [task, setTask] = useState("");
     const [activeCategoryId, setActiveCategoryId] = useState(null);
 
-    useEffect(() => {
-      console.log(category);
-    }, []);
-
     const setActiveCategory = (categoryId) => {
       setActiveCategoryId(categoryId);
     };

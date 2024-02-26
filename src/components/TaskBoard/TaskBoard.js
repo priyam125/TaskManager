@@ -25,9 +25,6 @@ const TaskBoard = () => {
   const onDragEnd = (result) => {
     const { source, destination } = result;
 
-    console.log(source);
-    console.log(destination);
-
     if (
       !destination ||
       (source.droppableId === destination.droppableId &&
